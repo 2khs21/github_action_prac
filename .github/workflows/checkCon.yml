@@ -1,0 +1,31 @@
+# workflow 이름에 오타 'Verfiy'를 'Verify'로 수정했습니다.
+name: Verify file
+
+# 'push'와 'pull_request' 이벤트 발생 시 워크플로가 실행됩니다.
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    # 'JOB_NAME' 변수를 사용해 작업 이름을 동적으로 설정합니다.
+    name: ${{ vars.JOB_NAME }}
+    
+    # 'EXEC_WF' 변수의 값이 'true'일 때만 이 작업이 실행됩니다.
+    if: ${{ vars.EXEC_WF == 'true' }}
+    
+    # 작업이 실행될 환경을 지정합니다.
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 저장소 코드를 체크아웃합니다.
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      # 파일 존재 여부를 확인하고, 없으면 실패 메시지를 출력합니다.
+      - name: Check for required file
+        run: |
+          # 'FILE_TO_CHECK' 변수에 지정된 파일이 존재하지 않는다면(||)
+          # 메시지를 출력하고 'exit 1'로 실패를 알립니다.
+          [[ -f ${{ vars.FILE_TO_CHECK }} ]] || \
+          ( echo "${{ vars.FILE_TO_CHECK }} file needs to be added to ${{ github.repository }} !" && exit 1 )
